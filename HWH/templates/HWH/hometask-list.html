@@ -1,0 +1,28 @@
+<h1>Неделя с {{ week.start_date }}</h1>
+
+<table>
+    <thead>
+    <tr>
+        <th>День</th>
+        <th>Предмет</th>
+        <th>Задание</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for day in week.days.all %}
+        <tr>
+            <td>{{ day.get_day_name }}</td>
+            <td>
+                {% for hometask in day.hometasks.all %}
+                    <a href="#">{{ hometask.subject }}</a>
+                {% endfor %}
+            </td>
+            <td>
+                {% for hometask in day.hometasks.all %}
+                    {{ hometask.task_text|truncatechars:20 }}
+                {% endfor %}
+            </td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
