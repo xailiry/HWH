@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Неделя {{ week.start_date }}, день - {{ day.get_day_name }}</title>
+</head>
+<body>
+Список домашнего задания:
+{% for hometask in day.hometasks.all %}
+    Домашнее по {{ hometask.subject }}
+        <ul>{{ hometask.task_text }}</ul>
+        <ul>Сделать на: {{ hometask.due_date }}</ul>
+        <ul>Статус: {{ hometask.status }}</ul>
+{% endfor %}
+</body>
+</html>

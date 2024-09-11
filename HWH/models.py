@@ -44,8 +44,13 @@ class HomeTask(models.Model):
         ('RES', 'Решено'),
         ('NOT', 'Нерешено'),
         ('URG', 'СРОЧНО'),
-    ], default='NOT', verbose_name='Статус')
+    ], default='NOT', verbose_name='Статус', blank=True, null=True)
     due_date = models.DateField(null=True, blank=True, verbose_name="Срок сдачи")
 
     def __str__(self):
         return f"{self.subject} - {self.task_text[:20]}"
+
+    def save(self, *args, **kwargs):
+        if not self.status:
+            self.status = 'NOT'
+        super().save(*args, **kwargs)

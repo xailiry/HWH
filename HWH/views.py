@@ -1,7 +1,8 @@
 import datetime
 
-from django.shortcuts import render, redirect, get_object_or_404
+from django.shortcuts import render, redirect
 from django.utils import timezone
+from django.views.generic import ListView
 
 from .forms import HometaskForm
 from .models import Week, Day
@@ -35,9 +36,22 @@ def create_hometask(request):
     return render(request, 'HWH/create_hometask.html', {'form': form})
 
 
-def week_detail(request, week_id):
-    # Получаем неделю по её ID
-    week = get_object_or_404(Week, id=week_id)
+# def week_detail(request, week_id):
+#     # Получаем неделю по её ID
+#     week = get_object_or_404(Week, id=week_id)
+#
+#     # Передаем неделю в шаблон
+#     return render(request, 'HWH/hometask-list.html', {'week': week})
+#
 
-    # Передаем неделю в шаблон
-    return render(request, 'HWH/hometask-list.html', {'week': week})
+class WeekListView(ListView):
+    model = Week
+    template_name = 'HWH/hometask-list.html'  # Шаблон, где будет отображаться список недель
+    context_object_name = 'weeks'
+    paginate_by = 1  # Пагинация: одна неделя на одну страницу
+
+
+def day_detail_view(request, week_id, day_id):
+    week = Week.objects.get(pk=week_id)
+    day = Day.objects.get(pk=day_id, week=week)
+    return render(request, 'HWH/day-detail.html', {'week': week, 'day': day})

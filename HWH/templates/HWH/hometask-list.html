@@ -1,28 +1,51 @@
-<h1>Неделя с {{ week.start_date }}</h1>
+<h1>Список недель</h1>
 
-<table>
-    <thead>
-    <tr>
-        <th>День</th>
-        <th>Предмет</th>
-        <th>Задание</th>
-    </tr>
-    </thead>
-    <tbody>
-    {% for day in week.days.all %}
+{% for week in weeks %}
+    <h2>Неделя с {{ week.start_date }}</h2>
+
+    <table>
+        <thead>
         <tr>
-            <td>{{ day.get_day_name }}</td>
-            <td>
-                {% for hometask in day.hometasks.all %}
-                    <a href="#">{{ hometask.subject }}</a>
-                {% endfor %}
-            </td>
-            <td>
-                {% for hometask in day.hometasks.all %}
-                    {{ hometask.task_text|truncatechars:20 }}
-                {% endfor %}
-            </td>
+            <th>День</th>
+            <th>Предмет</th>
+            <th>Задание</th>
         </tr>
-    {% endfor %}
-    </tbody>
-</table>
+        </thead>
+        <tbody>
+        {% for day in week.days.all %}
+            <tr>
+                <td><a href={% url 'day_detail' week_id=week.id day_id=day.id %}>{{ day.get_day_name }}</a></td>
+                <td>
+                    {% for hometask in day.hometasks.all %}
+                        <a href="#">{{ hometask.subject }}</a>
+                    {% endfor %}
+                </td>
+                <td>
+                    {% for hometask in day.hometasks.all %}
+                        {{ hometask.task_text|truncatechars:20 }}
+                    {% endfor %}
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- Пагинация -->
+    <div class="pagination">
+        <span class="step-links">
+            {% if page_obj.has_previous %}
+                <a href="?page=1">&laquo; Первая</a>
+                <a href="?page={{ page_obj.previous_page_number }}">Предыдущая</a>
+            {% endif %}
+
+            <span class="current">
+                Страница {{ page_obj.number }} из {{ page_obj.paginator.num_pages }}.
+            </span>
+
+            {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}">Следующая</a>
+                <a href="?page={{ page_obj.paginator.num_pages }}">Последняя &raquo;</a>
+            {% endif %}
+        </span>
+    </div>
+{% endfor %}
