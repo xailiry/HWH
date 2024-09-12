@@ -32,23 +32,31 @@ class Day(models.Model):
 
 class HomeTask(models.Model):
     day = models.ForeignKey(Day, related_name='hometasks', on_delete=models.CASCADE, verbose_name='День')
-    subject = models.CharField(max_length=3, choices=[
+    SUBJECT_CHOICES = [
         ('ENG', 'Английский язык'),
         ('RUS', 'Русский язык'),
         ('ALG', 'Алгебра'),
-        # ... другие предметы
-    ], verbose_name='Предмет')
+        # другие предметы
+    ]
+    subject = models.CharField(max_length=3, choices=SUBJECT_CHOICES, verbose_name='Предмет')
     task_text = models.TextField(max_length=256, verbose_name='Текст задания')
     assigned_date = models.DateField(auto_now_add=True, verbose_name='Дата задания')
-    status = models.CharField(max_length=3, choices=[
+    STATUS_CHOICES = [
         ('RES', 'Решено'),
         ('NOT', 'Нерешено'),
         ('URG', 'СРОЧНО'),
-    ], default='NOT', verbose_name='Статус', blank=True, null=True)
+    ]
+    status = models.CharField(max_length=3, choices=STATUS_CHOICES, default='NOT', verbose_name='Статус', blank=True, null=True)
     due_date = models.DateField(null=True, blank=True, verbose_name="Срок сдачи")
 
     def __str__(self):
         return f"{self.subject} - {self.task_text[:20]}"
+
+    def get_status_display(self):
+        return dict(self.STATUS_CHOICES).get(self.status, 'Неизвестно')
+
+    def get_subject_display(self):
+        return dict(self.SUBJECT_CHOICES).get(self.subject, 'Неизвестно')
 
     def save(self, *args, **kwargs):
         if not self.status:

@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Список всех домашних заданий</title>
+</head>
+<body>
+    <h1>Список всех домашних заданий</h1>
+
+    <!-- форма для фильтрации -->
+    <form method="get">
+        <label for="subject">Предмет:</label>
+        <select name="subject" id="subject">
+            <option value="">Все предметы</option>
+            {% for key, val in subjects %}
+                <option value="{{ key }}" {% if request.GET.subject == key %}selected{% endif %}>{{ val }}</option>
+            {% endfor %}
+        </select>
+
+        <label for="day">День:</label>
+        <select name="day" id="day">
+            <option value="">Все дни</option>
+            {% for day in days %}
+                <option value="{{ day.date|date:"Y-m-d" }}" {% if request.GET.day == day.date|stringformat:"Y-m-d" %}selected{% endif %}>
+                    {{ day.get_day_name }} ({{ day.date|date:"j F Y" }})
+                </option>
+            {% endfor %}
+        </select>
+
+        <label for="week">Неделя:</label>
+        <select name="week" id="week">
+            <option value="">Все недели</option>
+            {% for week in weeks %}
+                <option value="{{ week.start_date|date:"Y-m-d" }}" {% if request.GET.week == week.start_date|stringformat:"Y-m-d" %}selected{% endif %}>
+                    Неделя с {{ week.start_date|date:"j F Y" }}
+                </option>
+            {% endfor %}
+        </select>
+
+        <label for="status">Статус:</label>
+        <select name="status" id="status">
+            <option value="">Все статусы</option>
+            {% for key, val in statuses %}
+                <option value="{{ key }}" {% if request.GET.status == key %}selected{% endif %}>{{ val }}</option>
+            {% endfor %}
+        </select>
+
+        <button type="submit">Применить фильтр</button>
+    </form>
+    
+    <table>
+        <thead>
+        <tr>
+            <th>День</th>
+            <th>Предмет</th>
+            <th>Задание</th>
+            <th>Статус</th>
+            <th>Срок сдачи</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for homework in homeworks %}
+            <tr>
+                <td>{{ homework.day.get_day_name }} ({{ homework.day.date }})</td>
+                <td>{{ homework.get_subject_display }}</td>
+                <td>{{ homework.task_text|truncatechars:20 }}</td>
+                <td>{{ homework.get_status_display }}</td>
+                <td>{{ homework.due_date|date:"j F Y" }}</td>
+            </tr>
+        {% empty %}
+            <tr>
+                <td colspan="5">Нет домашних заданий по указанным параметрам</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>

@@ -1,17 +1,22 @@
 <!doctype html>
+
+{% load static %}
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport"
-          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Добавить ДЗ</title>
+    <link rel="stylesheet" href="{% static 'css/forms.css' %}">
 </head>
 <body>
-    <form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}  <!-- Это отобразит всю форму в виде параграфов -->
-    <button type="submit" class="btn btn-primary">Создать</button>
-</form>
+    <div class="container">
+        <h1>Добавить домашнее задание</h1>
+        <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit" class="btn btn-primary">Создать</button>
+        </form>
+    </div>
 </body>
 </html>

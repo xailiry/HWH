@@ -1,51 +1,75 @@
-<h1>Список недель</h1>
+<!doctype html>
+{% load static %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Список недель</title>
+    <link rel="stylesheet" href="{% static 'css/list.css' %}">
+</head>
+<body>
+    <div class="container">
+        <h1>Список недель</h1>
 
-{% for week in weeks %}
-    <h2>Неделя с {{ week.start_date }}</h2>
-
-    <table>
-        <thead>
-        <tr>
-            <th>День</th>
-            <th>Предмет</th>
-            <th>Задание</th>
-        </tr>
-        </thead>
-        <tbody>
-        {% for day in week.days.all %}
-            <tr>
-                <td><a href={% url 'day_detail' week_id=week.id day_id=day.id %}>{{ day.get_day_name }}</a></td>
-                <td>
-                    {% for hometask in day.hometasks.all %}
-                        <a href="#">{{ hometask.subject }}</a>
+        {% for week in weeks %}
+            <div class="week-card">
+                <h2>Неделя с {{ week.start_date }}</h2>
+                <table class="hometask-table">
+                    <thead>
+                    <tr>
+                        <th>День</th>
+                        <th>Предмет</th>
+                        <th>Срок сдачи</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for day in week.days.all %}
+                        <tr>
+                            <td>
+                                <a href="{% url 'day_detail' week_id=week.id day_id=day.id %}">
+                                    {{ day.get_day_name }}
+                                </a>
+                            </td>
+                            <td>
+                                {% for hometask in day.hometasks.all %}
+                                    <span class="subject">{{ hometask.subject }}</span>
+                                    {% if not forloop.last %}, {% endif %}
+                                {% endfor %}
+                            </td>
+                            <td>
+                                {% with day.hometasks.all|dictsort:"due_date" as sorted_tasks %}
+                                    {% for hometask in sorted_tasks %}
+                                        {{ hometask.due_date }}
+                                        {% if not forloop.last %}, {% endif %}
+                                    {% endfor %}
+                                {% endwith %}
+                            </td>
+                        </tr>
                     {% endfor %}
-                </td>
-                <td>
-                    {% for hometask in day.hometasks.all %}
-                        {{ hometask.task_text|truncatechars:20 }}
-                    {% endfor %}
-                </td>
-            </tr>
+                    </tbody>
+                </table>
+            </div>
         {% endfor %}
-        </tbody>
-    </table>
 
-    <!-- Пагинация -->
-    <div class="pagination">
-        <span class="step-links">
-            {% if page_obj.has_previous %}
-                <a href="?page=1">&laquo; Первая</a>
-                <a href="?page={{ page_obj.previous_page_number }}">Предыдущая</a>
-            {% endif %}
+        <!-- Пагинация -->
+        <div class="pagination">
+            <span class="step-links">
+                {% if page_obj.has_previous %}
+                    <a href="?page=1">&laquo; Первая</a>
+                    <a href="?page={{ page_obj.previous_page_number }}">Предыдущая</a>
+                {% endif %}
 
-            <span class="current">
-                Страница {{ page_obj.number }} из {{ page_obj.paginator.num_pages }}.
+                <span class="current">
+                    Страница {{ page_obj.number }} из {{ page_obj.paginator.num_pages }}.
+                </span>
+
+                {% if page_obj.has_next %}
+                    <a href="?page={{ page_obj.next_page_number }}">Следующая</a>
+                    <a href="?page={{ page_obj.paginator.num_pages }}">Последняя &raquo;</a>
+                {% endif %}
             </span>
-
-            {% if page_obj.has_next %}
-                <a href="?page={{ page_obj.next_page_number }}">Следующая</a>
-                <a href="?page={{ page_obj.paginator.num_pages }}">Последняя &raquo;</a>
-            {% endif %}
-        </span>
+        </div>
     </div>
-{% endfor %}
+</body>
+</html>

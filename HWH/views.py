@@ -5,7 +5,7 @@ from django.utils import timezone
 from django.views.generic import ListView
 
 from .forms import HometaskForm
-from .models import Week, Day
+from .models import Week, Day, HomeTask
 
 
 def create_hometask(request):
@@ -28,7 +28,7 @@ def create_hometask(request):
             hometask.day = day
             hometask.save()
 
-            return redirect('week_detail', week_id=week.id)  # редирект на список ДЗ
+            return redirect('week_list')  # редирект на список ДЗ
 
     else:
         form = HometaskForm()
@@ -55,3 +55,40 @@ def day_detail_view(request, week_id, day_id):
     week = Week.objects.get(pk=week_id)
     day = Day.objects.get(pk=day_id, week=week)
     return render(request, 'HWH/day-detail.html', {'week': week, 'day': day})
+
+
+def all_hw_list(request):
+    # Получение всех домашних заданий
+    homeworks = HomeTask.objects.all()
+
+    # Фильтры
+    subject = request.GET.get('subject')  # фильтр по предмету
+    day = request.GET.get('day')  # фильтр по дню
+    week = request.GET.get('week')  # фильтр по неделе
+    status = request.GET.get('status')  # фильтр по статусу
+
+    # Применение фильтров, если параметры переданы
+    if subject:
+        homeworks = homeworks.filter(subject=subject)
+    if day:
+        homeworks = homeworks.filter(day__date=day)
+    if week:
+        homeworks = homeworks.filter(day__week__start_date=week)
+    if status:
+        homeworks = homeworks.filter(status=status)
+
+    # Получаем список всех возможных предметов, недель и статусов для фильтров
+    subjects = HomeTask._meta.get_field('subject').choices
+    statuses = HomeTask._meta.get_field('status').choices
+    weeks = Week.objects.all()
+    days = Day.objects.all()
+
+    context = {
+        'homeworks': homeworks,
+        'subjects': subjects,
+        'statuses': statuses,
+        'weeks': weeks,
+        'days': days,
+    }
+
+    return render(request, 'HWH/all_hw_list.html', context)
